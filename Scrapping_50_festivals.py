@@ -70,3 +70,67 @@ df['Lieu'] = df['Lieu'].str.replace(r'\n\(.*?\)', '', regex=True).str.strip()
 
 # Vérifier le résultat
 print(df[['Classement', 'Nom', 'Lieu']].head())
+
+
+
+from geopy.geocoders import Nominatim
+
+geolocator = Nominatim(user_agent="festival_scraper")
+
+def geocode_location(location):
+    try:
+        geo = geolocator.geocode(location)
+        if geo:
+            return geo.latitude, geo.longitude
+        else:
+            return None, None
+    except Exception as e:
+        print(f"Erreur de géocodage pour {location}: {e}")
+        return None, None
+
+# Ajouter des colonnes Latitude et Longitude
+df[['Latitude', 'Longitude']] = df['Lieu'].apply(lambda x: pd.Series(geocode_location(x)))
+
+# Supprimer les lignes sans coordonnées
+df = df.dropna(subset=['Latitude', 'Longitude'])
+
+import folium
+
+# Créer une carte centrée sur la France
+map_festivals = folium.Map(location=[46.603354, 1.888334], zoom_start=6)
+
+# Ajouter des marqueurs pour chaque festival
+for _, row in df.iterrows():
+    folium.Marker(
+        location=[row['Latitude'], row['Longitude']],
+        popup=row['Nom']
+    ).add_to(map_festivals)
+
+# Sauvegarder la carte
+map_festivals.save("map_top_50_festivals.html")
+print("Carte sauvegardée sous 'map_top_50_festivals.html'")
+
+
+import os
+print("Carte sauvegardée ici :", os.path.abspath("map_top_50_festivals.html"))
+
+map_festivals.save("/home/onyxia/work/map_top_50_festivals.html")
+
+map_festivals.save("/home/onyxia/work/map_top_50_festivals.html")
+
+import folium
+
+# Exemple de carte
+map_festivals = folium.Map(location=[46.603354, 1.888334], zoom_start=6)
+map_festivals.save("map_top_50_festivals.html")
+
+# Afficher dans un notebook
+from IPython.display import IFrame
+
+IFrame("map_top_50_festivals.html", width=800, height=600)
+
+
+
+
+
+
