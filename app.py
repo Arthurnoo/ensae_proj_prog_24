@@ -1,5 +1,3 @@
-## On affiche sur une carte les festivals sélectionnés ##
-
 import subprocess
 import sys
 
@@ -16,6 +14,7 @@ install_packages()
 import streamlit as st
 import folium
 from streamlit_folium import st_folium
+print("Les packages streamlit, folium et streamlit-folium sont installés et prêts à être utilisés !")
 
 # Fonction pour afficher les festivals sur la carte
 def afficher_festivals_sur_carte(festivals, user_location):
