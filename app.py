@@ -1,5 +1,18 @@
-## Affichage sur une carte des festivals sélectionnés ##
+## On affiche sur une carte les festivals sélectionnés ##
 
+import subprocess
+import sys
+
+# Installer les packages nécessaires
+def install_packages():
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "folium"])
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "streamlit-folium"])
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "streamlit"])
+
+# Appeler la fonction pour installer les packages
+install_packages()
+
+# Vérification
 import streamlit as st
 import folium
 from streamlit_folium import st_folium
