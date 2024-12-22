@@ -1,3 +1,7 @@
+# Ce code implémente une application interactive pour recommander des festivals en fonction des préférences des utilisateurs. 
+# L'application utilise Streamlit pour l'interface utilisateur et l'API data.gouv.fr pour obtenir des suggestions d'adresses. 
+# Les utilisateurs peuvent fournir leur adresse, définir une distance maximale, sélectionner des types de festivals et indiquer leurs disponibilités.
+
 # Questionnaire : pour le lancer dans la page internet : écrire dans le terminal : streamlit run /home/onyxia/ensae_proj_prog_24/questions.py
 
 import streamlit as st
@@ -293,5 +297,15 @@ if st.button("Rechercher des festivals"):
         # filtered_festivals = filter_festivals(...)
         st.success(f"Merci pour vos réponses, {user_name} ! Nous allons rechercher un festival qui correspond à vos préférences.")
 
-
+# --- Résultats ---
+st.header("Résultats")
+if st.button("Trouver un festival"):
+    # Exemple de résultat basé sur les réponses (à adapter avec un vrai algorithme)
+    st.success("Nous avons trouvé un festival qui correspond à vos préférences ! 🎉")
+    st.markdown(f"""
+        **Adresse** : {selected_address if user_input else "Non spécifiée"}  
+        **Distance maximale** : {distance}  
+        **Catégories sélectionnées** : {', '.join(selected_categories) if selected_categories else "Aucune"}  
+        **Disponibilités** : {', '.join([str(d) for d in calendar_dates]) if calendar_dates else "Non spécifiées"}
+    """)
 
