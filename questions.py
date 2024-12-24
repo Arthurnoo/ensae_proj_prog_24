@@ -100,11 +100,15 @@ st.header("3. Vos préférences")
 user_types = st.multiselect("Types de festivals :", ["Musique", "Spectacle vivant", "Cinéma et audiovisuel", "Arts visuels et numériques", "Livre et littérature"])
 user_genres = []
 if "Musique" in user_types:
-    user_genres += st.multiselect("Genres musicaux :", ["Jazz", "Blues", "Électronique", "Pop", "Classique", "Hip-hop", "Reggae"])
+    user_genres += st.multiselect("Genres musicaux :", ["Musique classique et opéra", "Musiques actuelles et populaires", "Musiques du monde", "Jazz, blues, RnB", "Musique rock et métal", "Musique instrumentale", "Musique et festivals thématiques", "Musiques électroniques", "Musique pour jeunes publics", "Musiques folk et patrimoniales"])
 if "Spectacle vivant" in user_types:
-    user_genres += st.multiselect("Genres de spectacle vivant :", ["Théâtre", "Danse", "Cirque", "Marionnettes", "Arts de la rue"])
+    user_genres += st.multiselect("Genres de spectacle vivant :", ["Théâtre", "Danse", "Arts de la Rue", "Cirque", "Musique et Chant", "Marionnettes et Théâtre d'objets", "Spectacles pour Jeune Public", "Performance et Arts Visuels", "Humour et Café-Théâtre", "Pluridisciplinaire"])
 if "Cinéma et audiovisuel" in user_types:
-    user_genres += st.multiselect("Genres de cinéma :", ["Documentaire", "Fiction", "Animation", "Ciné-concert", "Court métrage"])
+    user_genres += st.multiselect("Genres de cinéma :", ["Cinéma généraliste long métrage", "Cinéma généraliste court métrage", "Audiovisuel et médias", "Festivals thématiques", "Cinématographies du monde", "Rétrospectives et classiques", "Techniques et métiers", "Cinéma et musique", "Cinéma expérimental et arts associés", "Jeunes publics", "Événements et projections spéciales"])
+if "Arts visuels et numériques" in user_types:
+    user_genres += st.multiselect("Genres d'arts visuels :", ["Arts numériques et vidéo", "Arts plastiques et visuels", "Design et architecture", "Arts urbains", "Performance et multimédia", "Littérature et illustration", "Photographie, cinéma et audiovisuel", "Art d’idées et sciences", "Autres"])
+if "Livre et littérature" in user_types:
+    user_genres += st.multiselect("Genres de littérature :", ["Romans et Littérature Générale", "Bandes Dessinées et Illustrations", "Jeunesse et Jeune Public", "Policier et Thriller", "Science-Fiction et Fantasy", "Littératures régionales et du Monde", "Édition et Métiers du Livre", "Conférences et Rencontres Littéraires", "Histoire et Patrimoine Littéraire", "Pluridisciplinaire : arts et littératures croisés "])
 
 # --- Étape 4 : Disponibilités ---
 st.header("4. Vos disponibilités")
@@ -113,10 +117,6 @@ user_dates = st.date_input("Sélectionnez une période de disponibilité :", [da
 # --- Étape 5 : Budget ---
 st.header("5. Votre budget")
 user_budget = st.slider("Budget pour le festival (en euros) :", 0, 500, (20, 100))
-
-# --- Étape 6 : Accessibilité ---
-st.header("6. Accessibilité")
-user_accessible = st.checkbox("Afficher uniquement les festivals accessibles aux personnes à mobilité réduite")
 
 # charger les données 
 import pandas as pd
