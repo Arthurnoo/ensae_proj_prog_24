@@ -4,6 +4,24 @@
 
 # Questionnaire : pour le lancer dans la page internet : écrire dans le terminal : streamlit run /home/onyxia/ensae_proj_prog_24/questions.py
 
+import subprocess
+import sys
+
+# Installer les packages nécessaires
+def install_packages():
+    packages = [
+        "streamlit",
+        "pandas",
+        "requests",
+        "geopy",
+    ]
+    for package in packages:
+        subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+
+# Appeler la fonction pour installer les packages
+install_packages()
+
+# Vérification des imports
 import streamlit as st
 import pandas as pd
 import requests
