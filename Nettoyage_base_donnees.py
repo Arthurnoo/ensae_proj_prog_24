@@ -48,7 +48,7 @@
 # On a aussi fait le choix de ne conserver que les festivals se déroulant en France métropolitaine. 
 # 
 
-# In[70]:
+# In[28]:
 
 
 import s3fs
@@ -97,7 +97,7 @@ print(df["Région principale de déroulement"].unique())
 
 # Il semble d'abord qu'il faille nettoyer la base de données, puisqu'il y a des caractères invisibles dans les noms des colonnes.
 
-# In[71]:
+# In[29]:
 
 
 # Nettoyer les noms des colonnes pour supprimer les caractères invisibles
@@ -107,7 +107,7 @@ df.columns = df.columns.str.replace(r'^\ufeff', '', regex=True).str.strip()
 print(df.columns)
 
 
-# In[72]:
+# In[30]:
 
 
 # Construire un dictionnaire où chaque clé principale est "Nom du festival_Identifiant"
@@ -138,7 +138,7 @@ list(dictionnaire.items())[:5]  # Afficher les 5 premières entrées du dictionn
 # 
 # **Par exemple**, le festival Printemps de paroles est noté pluridisciplinaire, mais avec aucune sous-catégorie associée.
 
-# In[73]:
+# In[31]:
 
 
 # Liste des colonnes sous-catégories que l'on analyse
@@ -191,7 +191,7 @@ print(df[["Nom du festival", "Discipline dominante"]].head(50))
 
 # **La catégorie Spectacle vivant :**
 
-# In[74]:
+# In[32]:
 
 
 import re  # Importer le module pour gérer les séparateurs multiples
@@ -306,7 +306,7 @@ df["Nouvelles sous-catégories spectacle vivant"] = df.apply(attribuer_sous_cate
 
 
 
-# In[75]:
+# In[33]:
 
 
 ##                  VÉRIFICATION DES RÉSULTATS 
@@ -318,7 +318,7 @@ spectacle_vivant_df = df[df["Discipline dominante"].str.contains("Spectacle viva
 print(spectacle_vivant_df[["Nom du festival", "Région principale de déroulement", "Discipline dominante", "Nouvelles sous-catégories spectacle vivant"]].head(50))
 
 
-# In[76]:
+# In[34]:
 
 
 # Suppression des festivals pour lesquels aucune sous-catégorie n'est renseignée. - il y en a environ 300 sur les 1600 festivals de Spectacle vivant. 
@@ -347,7 +347,7 @@ print(spectacle_vivant_df[["Nom du festival", "Région principale de déroulemen
 # * Le nombre de festivals dans chaque sous-catégorie. 
 # 
 
-# In[77]:
+# In[35]:
 
 
 # Compter les lignes où la colonne "Discipline dominante" contient "spectacle vivant"
@@ -469,7 +469,7 @@ print(f"Nombre total de festivals ayant pour sous-catégorie 'Pluridisciplinaire
 
 # **La catégorie Arts visuels, arts numériques :**
 
-# In[78]:
+# In[36]:
 
 
 # Problèmes dans les sorties "Sous catégorie non reconnue" à cause des virgules dans les parenthèses que le code prend pour un séparateur alors qu'il ne devrait pas. 
@@ -485,7 +485,7 @@ def split_with_parentheses_handling(text):
     return re.split(r',\s*(?![^(]*\))', text.strip())
 
 
-# In[79]:
+# In[37]:
 
 
 import re
@@ -597,7 +597,7 @@ df["Nouvelles sous-catégories arts visuels"] = df.apply(attribuer_sous_categori
 #ajouter base art à la main 
 
 
-# In[80]:
+# In[38]:
 
 
 ##                  VÉRIFICATION DES RÉSULTATS 
@@ -614,7 +614,7 @@ print(arts_visuels_df[["Nom du festival", "Discipline dominante", "Nouvelles sou
 # * Le nombre de festivals dans chaque sous-catégorie. 
 # 
 
-# In[81]:
+# In[39]:
 
 
 # Compter les lignes où la colonne "Discipline dominante" contient "arts visuels, arts numériques"
@@ -736,7 +736,7 @@ print(f"Nombre total de festivals ayant pour sous-catégorie 'Autres' : {count_a
 
 # **La catégorie Cinéma, audiovisuel :**
 
-# In[82]:
+# In[40]:
 
 
 # Problèmes dans les sorties "Sous catégorie non reconnue" à cause des virgules dans les parenthèses que le code prend pour un séparateur alors qu'il ne devrait pas. 
@@ -752,7 +752,7 @@ def split_with_parentheses_handling(text):
     return re.split(r',\s*(?![^(]*\))', text.strip())
 
 
-# In[83]:
+# In[41]:
 
 
 import re
@@ -881,7 +881,7 @@ df["Nouvelles sous-catégories cinéma et audiovisuel"] = df.apply(attribuer_sou
 
 
 
-# In[84]:
+# In[42]:
 
 
 ##                  VÉRIFICATION DES RÉSULTATS 
@@ -897,7 +897,7 @@ print(cinema_df[["Nom du festival", "Discipline dominante", "Nouvelles sous-cat�
 # * Le nombre de festivals ayant pour discipline dominante "Cinéma, audiovisuel". 
 # * Le nombre de festivals dans chaque sous-catégorie. 
 
-# In[85]:
+# In[43]:
 
 
 # Compter les lignes où la colonne "Discipline dominante" contient "Cinéma, audiovisuel"
@@ -1031,7 +1031,7 @@ print(f"Nombre total de festivals ayant pour sous-catégorie 'Événements et pr
 
 # **La catégorie Livre, littérature**
 
-# In[86]:
+# In[44]:
 
 
 # Problèmes dans les sorties "Sous catégorie non reconnue" à cause des virgules dans les parenthèses que le code prend pour un séparateur alors qu'il ne devrait pas. 
@@ -1047,7 +1047,7 @@ def split_with_parentheses_handling(text):
     return re.split(r',\s*(?![^(]*\))', text.strip())
 
 
-# In[87]:
+# In[45]:
 
 
 import re  # Importer le module pour gérer les séparateurs multiples
@@ -1170,7 +1170,7 @@ df["Nouvelles sous-catégories livre et littérature"] = df.apply(attribuer_sous
 # Citéphilo à ajouter à la main ; formule BUla 
 
 
-# In[88]:
+# In[46]:
 
 
 ##                  VÉRIFICATION DES RÉSULTATS 
@@ -1186,7 +1186,7 @@ print(livre_df[["Nom du festival", "Discipline dominante", "Nouvelles sous-caté
 # * Le nombre de festivals ayant pour discipline dominante "Livre, littérature". 
 # * Le nombre de festivals dans chaque sous-catégorie. 
 
-# In[89]:
+# In[47]:
 
 
 # Compter les lignes où la colonne "Discipline dominante" contient "Livre, littérature"
@@ -1308,7 +1308,7 @@ print(f"Nombre total de festivals ayant pour sous-catégorie 'Pluridisciplinaire
 
 # **La catégorie Musique**
 
-# In[90]:
+# In[48]:
 
 
 # Problèmes dans les sorties "Sous catégorie non reconnue" à cause des virgules dans les parenthèses que le code prend pour un séparateur alors qu'il ne devrait pas. 
@@ -1324,7 +1324,7 @@ def split_with_parentheses_handling(text):
     return re.split(r',\s*(?![^(]*\))', text.strip())
 
 
-# In[91]:
+# In[49]:
 
 
 import re
@@ -1519,7 +1519,7 @@ def attribuer_sous_categories(row):
 df["Nouvelles sous-catégories musique"] = df.apply(attribuer_sous_categories, axis=1)
 
 
-# In[92]:
+# In[50]:
 
 
 ##                  VÉRIFICATION DES RÉSULTATS 
@@ -1531,7 +1531,7 @@ musique_df = df[df["Discipline dominante"].str.contains("Musique", na=False, cas
 print(musique_df[["Nom du festival", "Discipline dominante", "Nouvelles sous-catégories musique"]].head(50))
 
 
-# In[93]:
+# In[51]:
 
 
 # Compter les lignes où la colonne "Discipline dominante" contient "Musique"
@@ -1651,16 +1651,44 @@ count_folk = df["Nouvelles sous-catégories musique"].apply(
 print(f"Nombre total de festivals ayant pour sous-catégorie 'Musiques folk et patrimoniales' : {count_folk}")
 
 
-# In[94]:
+# In[52]:
 
 
 print(df.head())
 
 
-# In[95]:
+# ### <u>4. Supression des anciennes colonnes  <u>
+
+# In[53]:
+
+
+colonnes_a_supprimer = ["Sous-catégorie spectacle vivant", "Sous-catégorie musique", "Sous-catégorie arts visuels et arts numériques", "Sous-catégorie livre et littérature", "Sous-catégorie cinéma et audiovisuel", "Sous-catégorie Musique CNM"]
+
+df = df.drop(columns = colonnes_a_supprimer)
+
+print(df.columns)
+
+
+# In[54]:
 
 
 if __name__ == "__main__":
     # Assurez-vous que df existe bien à la fin de ce fichier
     pass
 
+
+# ### <u>5. Bon format de la colonne période  <u>
+
+# In[55]:
+
+
+# Modifier la colonne pour ajouter une majuscule au début des périodes
+df["Période principale de déroulement du festival"] = df["Période principale de déroulement du festival"].replace({
+    "avant-saison (1er janvier - 20 juin)": "Avant-saison (1er janvier - 20 juin)",
+    "saison (21 juin - 5 septembre)": "Saison (21 juin - 5 septembre)",
+    "après-saison (6 septembre - 31 décembre)": "Après-saison (6 septembre - 31 décembre)"
+})
+
+# Vérifier les valeurs uniques après modification
+print("Valeurs après modification :")
+print(df["Période principale de déroulement du festival"].unique())
