@@ -48,22 +48,47 @@
 # On a aussi fait le choix de ne conserver que les festivals se déroulant en France métropolitaine. 
 # 
 
-# In[28]:
+# In[5]:
 
 
+import os
 import s3fs
 import pandas as pd
 
-# Configuration du bucket et du chemin du fichier
-MY_BUCKET = "arthurneau"  # Remplace par le nom de ton bucket
-FILE_PATH_S3 = f"{MY_BUCKET}/diffusion/festivals_en_France (1).csv"  # Chemin complet sur MinIO
+# Configuration des variables d'environnement
+os.environ["AWS_ACCESS_KEY_ID"] = '4DYBKFH7ZKKBNMIYH7VD'
+os.environ["AWS_SECRET_ACCESS_KEY"] = '4wGtwPtf++JHMKcUkBp4viyzgM7DGbTNJwUdtIFz'
+os.environ["AWS_SESSION_TOKEN"] = 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NLZXkiOiI0RFlCS0ZIN1pLS0JOTUlZSDdWRCIsImFsbG93ZWQtb3JpZ2lucyI6WyIqIl0sImF1ZCI6WyJtaW5pby1kYXRhbm9kZSIsIm9ueXhpYSIsImFjY291bnQiXSwiYXV0aF90aW1lIjoxNzM0NDI3MzY4LCJhenAiOiJvbnl4aWEiLCJlbWFpbCI6ImFydGh1ci5uZWF1QGVuc2FlLmZyIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImV4cCI6MTczNjA4ODM3NSwiZmFtaWx5X25hbWUiOiJOZWF1IiwiZ2l2ZW5fbmFtZSI6IkFydGh1ciIsImdyb3VwcyI6WyJVU0VSX09OWVhJQSJdLCJpYXQiOjE3MzU0ODM1NzUsImlzcyI6Imh0dHBzOi8vYXV0aC5sYWIuc3NwY2xvdWQuZnIvYXV0aC9yZWFsbXMvc3NwY2xvdWQiLCJqdGkiOiJlMTgzZTY4NS1mNzEzLTQ0YTktOWNmZC00NTY1MWQxZmYzMzIiLCJuYW1lIjoiQXJ0aHVyIE5lYXUiLCJwb2xpY3kiOiJzdHNvbmx5IiwicHJlZmVycmVkX3VzZXJuYW1lIjoiYXJ0aHVybmVhdSIsInJlYWxtX2FjY2VzcyI6eyJyb2xlcyI6WyJvZmZsaW5lX2FjY2VzcyIsInVtYV9hdXRob3JpemF0aW9uIiwiZGVmYXVsdC1yb2xlcy1zc3BjbG91ZCJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sInJvbGVzIjpbIm9mZmxpbmVfYWNjZXNzIiwidW1hX2F1dGhvcml6YXRpb24iLCJkZWZhdWx0LXJvbGVzLXNzcGNsb3VkIl0sInNjb3BlIjoib3BlbmlkIHByb2ZpbGUgZ3JvdXBzIGVtYWlsIiwic2lkIjoiYzViZTMxM2EtNzlmYS00ZDMzLTg1MjEtNjcxYTQ1Y2VmMWVlIiwic3ViIjoiNjY0OTQ3YjUtNjE5OC00NTBiLWI3MzctODc1MTQ4ZDcwYThkIiwidHlwIjoiQmVhcmVyIn0.J1FI5o8t-VkPvoDVxLl64MHOrIEJezOo6ZyEKg2Z0URscUjfIAXp94SrOMo6DqJOtaGCIHTNf-8XThndR0fIjQ'
+os.environ["AWS_DEFAULT_REGION"] = 'us-east-1'
 
 # Initialisation de la connexion à MinIO
-fs = s3fs.S3FileSystem(client_kwargs={"endpoint_url": "https://minio.lab.sspcloud.fr"})
+fs = s3fs.S3FileSystem(
+    client_kwargs={'endpoint_url': 'https://'+'minio.lab.sspcloud.fr'},
+    key=os.environ["AWS_ACCESS_KEY_ID"],
+    secret=os.environ["AWS_SECRET_ACCESS_KEY"],
+    token=os.environ["AWS_SESSION_TOKEN"]
+)
 
-# Importer le fichier CSV depuis MinIO
-with fs.open(FILE_PATH_S3, "r") as file_in:
-    df = pd.read_csv(file_in, sep=';', encoding='utf-8-sig')
+# Lister les fichiers dans le dossier
+try:
+    print("Contenu du dossier diffusion :")
+    print(fs.ls("arthurneau/diffusion/"))
+except Exception as e:
+    print(f"Erreur de connexion ou permissions : {e}")
+
+try:
+    # Importer le fichier CSV
+    file_path_s3 = "arthurneau/diffusion/festivals_en_France (1).csv"
+    with fs.open(file_path_s3, "r") as file_in:
+        df = pd.read_csv(file_in, sep=';', encoding='utf-8-sig')
+    print("Fichier chargé avec succès :")
+    print(df_france.head())
+except Exception as e:
+    print(f"Erreur lors de l'importation du fichier : {e}")
+
+
+# In[6]:
+
 
 # Afficher les premières lignes
 print(df.head())  # Afficher les 5 premières lignes
@@ -97,7 +122,7 @@ print(df["Région principale de déroulement"].unique())
 
 # Il semble d'abord qu'il faille nettoyer la base de données, puisqu'il y a des caractères invisibles dans les noms des colonnes.
 
-# In[29]:
+# In[7]:
 
 
 # Nettoyer les noms des colonnes pour supprimer les caractères invisibles
@@ -107,7 +132,7 @@ df.columns = df.columns.str.replace(r'^\ufeff', '', regex=True).str.strip()
 print(df.columns)
 
 
-# In[30]:
+# In[8]:
 
 
 # Construire un dictionnaire où chaque clé principale est "Nom du festival_Identifiant"
@@ -138,7 +163,7 @@ list(dictionnaire.items())[:5]  # Afficher les 5 premières entrées du dictionn
 # 
 # **Par exemple**, le festival Printemps de paroles est noté pluridisciplinaire, mais avec aucune sous-catégorie associée.
 
-# In[31]:
+# In[9]:
 
 
 # Liste des colonnes sous-catégories que l'on analyse
@@ -191,7 +216,7 @@ print(df[["Nom du festival", "Discipline dominante"]].head(50))
 
 # **La catégorie Spectacle vivant :**
 
-# In[32]:
+# In[10]:
 
 
 import re  # Importer le module pour gérer les séparateurs multiples
@@ -306,7 +331,7 @@ df["Nouvelles sous-catégories spectacle vivant"] = df.apply(attribuer_sous_cate
 
 
 
-# In[33]:
+# In[11]:
 
 
 ##                  VÉRIFICATION DES RÉSULTATS 
@@ -318,7 +343,7 @@ spectacle_vivant_df = df[df["Discipline dominante"].str.contains("Spectacle viva
 print(spectacle_vivant_df[["Nom du festival", "Région principale de déroulement", "Discipline dominante", "Nouvelles sous-catégories spectacle vivant"]].head(50))
 
 
-# In[34]:
+# In[12]:
 
 
 # Suppression des festivals pour lesquels aucune sous-catégorie n'est renseignée. - il y en a environ 300 sur les 1600 festivals de Spectacle vivant. 
@@ -347,7 +372,7 @@ print(spectacle_vivant_df[["Nom du festival", "Région principale de déroulemen
 # * Le nombre de festivals dans chaque sous-catégorie. 
 # 
 
-# In[35]:
+# In[13]:
 
 
 # Compter les lignes où la colonne "Discipline dominante" contient "spectacle vivant"
@@ -469,7 +494,7 @@ print(f"Nombre total de festivals ayant pour sous-catégorie 'Pluridisciplinaire
 
 # **La catégorie Arts visuels, arts numériques :**
 
-# In[36]:
+# In[14]:
 
 
 # Problèmes dans les sorties "Sous catégorie non reconnue" à cause des virgules dans les parenthèses que le code prend pour un séparateur alors qu'il ne devrait pas. 
@@ -485,7 +510,7 @@ def split_with_parentheses_handling(text):
     return re.split(r',\s*(?![^(]*\))', text.strip())
 
 
-# In[37]:
+# In[15]:
 
 
 import re
@@ -597,7 +622,7 @@ df["Nouvelles sous-catégories arts visuels"] = df.apply(attribuer_sous_categori
 #ajouter base art à la main 
 
 
-# In[38]:
+# In[16]:
 
 
 ##                  VÉRIFICATION DES RÉSULTATS 
@@ -614,7 +639,7 @@ print(arts_visuels_df[["Nom du festival", "Discipline dominante", "Nouvelles sou
 # * Le nombre de festivals dans chaque sous-catégorie. 
 # 
 
-# In[39]:
+# In[17]:
 
 
 # Compter les lignes où la colonne "Discipline dominante" contient "arts visuels, arts numériques"
@@ -736,7 +761,7 @@ print(f"Nombre total de festivals ayant pour sous-catégorie 'Autres' : {count_a
 
 # **La catégorie Cinéma, audiovisuel :**
 
-# In[40]:
+# In[18]:
 
 
 # Problèmes dans les sorties "Sous catégorie non reconnue" à cause des virgules dans les parenthèses que le code prend pour un séparateur alors qu'il ne devrait pas. 
@@ -752,7 +777,7 @@ def split_with_parentheses_handling(text):
     return re.split(r',\s*(?![^(]*\))', text.strip())
 
 
-# In[41]:
+# In[19]:
 
 
 import re
@@ -881,7 +906,7 @@ df["Nouvelles sous-catégories cinéma et audiovisuel"] = df.apply(attribuer_sou
 
 
 
-# In[42]:
+# In[20]:
 
 
 ##                  VÉRIFICATION DES RÉSULTATS 
@@ -897,7 +922,7 @@ print(cinema_df[["Nom du festival", "Discipline dominante", "Nouvelles sous-cat�
 # * Le nombre de festivals ayant pour discipline dominante "Cinéma, audiovisuel". 
 # * Le nombre de festivals dans chaque sous-catégorie. 
 
-# In[43]:
+# In[21]:
 
 
 # Compter les lignes où la colonne "Discipline dominante" contient "Cinéma, audiovisuel"
@@ -1031,7 +1056,7 @@ print(f"Nombre total de festivals ayant pour sous-catégorie 'Événements et pr
 
 # **La catégorie Livre, littérature**
 
-# In[44]:
+# In[22]:
 
 
 # Problèmes dans les sorties "Sous catégorie non reconnue" à cause des virgules dans les parenthèses que le code prend pour un séparateur alors qu'il ne devrait pas. 
@@ -1047,7 +1072,7 @@ def split_with_parentheses_handling(text):
     return re.split(r',\s*(?![^(]*\))', text.strip())
 
 
-# In[45]:
+# In[23]:
 
 
 import re  # Importer le module pour gérer les séparateurs multiples
@@ -1170,7 +1195,7 @@ df["Nouvelles sous-catégories livre et littérature"] = df.apply(attribuer_sous
 # Citéphilo à ajouter à la main ; formule BUla 
 
 
-# In[46]:
+# In[24]:
 
 
 ##                  VÉRIFICATION DES RÉSULTATS 
@@ -1186,7 +1211,7 @@ print(livre_df[["Nom du festival", "Discipline dominante", "Nouvelles sous-caté
 # * Le nombre de festivals ayant pour discipline dominante "Livre, littérature". 
 # * Le nombre de festivals dans chaque sous-catégorie. 
 
-# In[47]:
+# In[25]:
 
 
 # Compter les lignes où la colonne "Discipline dominante" contient "Livre, littérature"
@@ -1308,7 +1333,7 @@ print(f"Nombre total de festivals ayant pour sous-catégorie 'Pluridisciplinaire
 
 # **La catégorie Musique**
 
-# In[48]:
+# In[26]:
 
 
 # Problèmes dans les sorties "Sous catégorie non reconnue" à cause des virgules dans les parenthèses que le code prend pour un séparateur alors qu'il ne devrait pas. 
@@ -1324,7 +1349,7 @@ def split_with_parentheses_handling(text):
     return re.split(r',\s*(?![^(]*\))', text.strip())
 
 
-# In[49]:
+# In[27]:
 
 
 import re
@@ -1519,7 +1544,7 @@ def attribuer_sous_categories(row):
 df["Nouvelles sous-catégories musique"] = df.apply(attribuer_sous_categories, axis=1)
 
 
-# In[50]:
+# In[28]:
 
 
 ##                  VÉRIFICATION DES RÉSULTATS 
@@ -1531,7 +1556,7 @@ musique_df = df[df["Discipline dominante"].str.contains("Musique", na=False, cas
 print(musique_df[["Nom du festival", "Discipline dominante", "Nouvelles sous-catégories musique"]].head(50))
 
 
-# In[51]:
+# In[29]:
 
 
 # Compter les lignes où la colonne "Discipline dominante" contient "Musique"
@@ -1651,7 +1676,7 @@ count_folk = df["Nouvelles sous-catégories musique"].apply(
 print(f"Nombre total de festivals ayant pour sous-catégorie 'Musiques folk et patrimoniales' : {count_folk}")
 
 
-# In[52]:
+# In[30]:
 
 
 print(df.head())
@@ -1659,7 +1684,7 @@ print(df.head())
 
 # ### <u>4. Supression des anciennes colonnes  <u>
 
-# In[53]:
+# In[31]:
 
 
 colonnes_a_supprimer = ["Sous-catégorie spectacle vivant", "Sous-catégorie musique", "Sous-catégorie arts visuels et arts numériques", "Sous-catégorie livre et littérature", "Sous-catégorie cinéma et audiovisuel", "Sous-catégorie Musique CNM"]
@@ -1669,7 +1694,7 @@ df = df.drop(columns = colonnes_a_supprimer)
 print(df.columns)
 
 
-# In[54]:
+# In[32]:
 
 
 if __name__ == "__main__":
@@ -1679,7 +1704,7 @@ if __name__ == "__main__":
 
 # ### <u>5. Bon format de la colonne période  <u>
 
-# In[55]:
+# In[33]:
 
 
 # Modifier la colonne pour ajouter une majuscule au début des périodes
@@ -1692,3 +1717,4 @@ df["Période principale de déroulement du festival"] = df["Période principale 
 # Vérifier les valeurs uniques après modification
 print("Valeurs après modification :")
 print(df["Période principale de déroulement du festival"].unique())
+

@@ -1,5 +1,1 @@
-Classement,Nom,Lieu,Lien,Latitude,Longitude,Festival match,Nom_clean,Commune_clean
-12,LUXEXPO OPEN AIR,Luxembourg,https://infoconcert.com/festival/luxexpo-open-air-16011/concerts.html,49.6112768,6.129799,,luxexpo open air,luxembourg
-23,LES DEFERLANTES SUD DE FRANCE,Le Barcares,https://infoconcert.com/festival/les-deferlantes-sud-de-france-4554/concerts.html,42.7946794,3.0335243,,les deferlantes sud de france,le barcares
-25,XMAS VYBE,Bordeaux,https://infoconcert.com/festival/xmas-vybe-15065/concerts.html,44.841225,-0.5800364,,xmas vybe,bordeaux
-43,BOOMIN FEST,Nantes,https://infoconcert.com/festival/boomin-fest-13379/concerts.html,47.2186371,-1.5541362,,boomin fest,nantes
+Classement,Nom,Lieu,Lien,Latitude,Longitude,Nom_clean,Commune_clean,Festival match
