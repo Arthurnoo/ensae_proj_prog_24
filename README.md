@@ -40,4 +40,7 @@ Avant de faire fonctionner questions.py et app.py, il faut installer les modules
 - pip install geopy
 - pip install folium
 - pip install streamlit-folium
+
 La base de notre projet était un moteur de recherche des festivals en fonction d'un questionnaire personnel (questions.py). Il suffit alors de le lancer (streamlit run questions.py) pour tomber sur un questionnaire (y répondre). Ensuite, nous cherchons des correspondances (filtre_festivals.ipynb) avec les festivals de notre base de données de départ, que nous affichons dans la carte finale (app.py). Nous transmettons les informations entre temps par user_data.json.
+
+Pour faire tourner le questionnaire (questions.py : streamlit run questions.py)
