@@ -35,4 +35,9 @@ Une idée que nous avons eu est de regarder l'impact des gros festivals (en tail
 Cela nous permet ensuite de faire des statistiques sur l'impact de ces 50 festivals sur tous les autres (Stats_impact_gros_fest.ipynb).
 
 III. Troisième partie : Moteur de recherche
+Avant de faire fonctionner questions.py et app.py, il faut installer les modules suivants :
+- pip install streamlit
+- pip install geopy
+- pip install folium
+- pip install streamlit-folium
 La base de notre projet était un moteur de recherche des festivals en fonction d'un questionnaire personnel (questions.py). Il suffit alors de le lancer (streamlit run questions.py) pour tomber sur un questionnaire (y répondre). Ensuite, nous cherchons des correspondances (filtre_festivals.ipynb) avec les festivals de notre base de données de départ, que nous affichons dans la carte finale (app.py). Nous transmettons les informations entre temps par user_data.json.
