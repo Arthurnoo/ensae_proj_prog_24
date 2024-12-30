@@ -10,16 +10,12 @@ def install_packages():
 # Appeler la fonction pour installer les packages
 install_packages()
 
-# Vérification
+# Importation des modules nécessaires
 import streamlit as st
 import folium
 from streamlit_folium import st_folium
-print("Les packages streamlit, folium et streamlit-folium sont installés et prêts à être utilisés !")
-
 import json
-
-
-
+import pandas as pd
 
 # Charger les données utilisateur collectées
 try:
@@ -27,28 +23,40 @@ try:
         user_data = json.load(json_file)
         print("Données utilisateur récupérées :", user_data)
 except FileNotFoundError:
-    print("Aucune donnée utilisateur n'a été collectée. Lancez 'questions.py' pour collecter les données.")
+    st.error("Aucune donnée utilisateur n'a été collectée. Lancez 'questions.py' pour collecter les données.")
+    user_data = {"coordinates": [48.8566, 2.3522]}  # Coordonnées par défaut (Paris)
 
-
-
-
-# On importe les festivals
-import pandas as pd
-
-# Charger df_end depuis le fichier CSV
+# Charger les festivals depuis le fichier CSV
 df_end = pd.read_csv('df_end.csv')
 
-# Fonction pour afficher les festivals sur la carte
+# Fonction pour décaler légèrement les marqueurs en cas de doublon
+def ajuster_coordonnees(festivals):
+    """
+    Décale légèrement les coordonnées pour les festivals ayant les mêmes positions géographiques.
+    """
+    coords_count = {}
+    for i, row in festivals.iterrows():
+        coords = row['Géocodage xy'].strip()
+        if coords not in coords_count:
+            coords_count[coords] = 0
+        else:
+            coords_count[coords] += 1
+        
+        # Décaler légèrement la position
+        lat, lon = map(float, coords.split(','))
+        offset = coords_count[coords] * 0.005  # Décalage minime
+        lat += offset
+        lon += offset
+        festivals.at[i, 'Géocodage xy'] = f"{lat},{lon}"
+    return festivals
+
+# Appliquer l'ajustement des coordonnées
+df_end = ajuster_coordonnees(df_end)
+
+# Fonction pour afficher les festivals sur une carte
 def afficher_festivals_sur_carte(festivals, user_location):
     """
     Affiche les festivals sur une carte interactive avec l'adresse de l'utilisateur.
-    
-    Arguments :
-    festivals -- DataFrame contenant les informations des festivals
-    Chaque festival doit avoir les colonnes : 
-    'Nom du festival', 'Géocodage xy', 'Période principale de déroulement du festival',
-    'Discipline dominante', 'Envergure territoriale', 'Site internet du festival'.
-    user_location -- Tuple contenant (latitude, longitude) pour l'adresse de l'utilisateur
     """
     carte = folium.Map(location=user_location, zoom_start=6, tiles="OpenStreetMap")
     
@@ -62,17 +70,17 @@ def afficher_festivals_sur_carte(festivals, user_location):
     
     # Ajouter un marqueur pour chaque festival
     for _, row in festivals.iterrows():
-        # Extraire les coordonnées depuis la colonne 'Géocodage xy'
         try:
+            # Extraire les coordonnées depuis la colonne 'Géocodage xy'
             lat, lon = map(float, row['Géocodage xy'].split(','))
         except (ValueError, AttributeError):
             continue  # Ignorer si les coordonnées ne sont pas valides
-        
+
         nom = row['Nom du festival']
         date = row['Période principale de déroulement du festival']
         description = f"{row['Discipline dominante']} - {row['Envergure territoriale']}"
         lien = row['Site internet du festival'] if pd.notna(row['Site internet du festival']) else "#"
-        
+
         # Ajouter un marqueur avec popup
         popup_content = f"""
         <b>{nom}</b><br>
@@ -89,26 +97,31 @@ def afficher_festivals_sur_carte(festivals, user_location):
     
     return carte
 
-
+# Utiliser la localisation de l'utilisateur
 user_location = user_data['coordinates']
 
-# Afficher la carte dans Streamlit
+# Titre dans Streamlit
 st.title("Carte des Festivals en France")
+
+# Générer la carte
 carte = afficher_festivals_sur_carte(df_end, user_location)
 
 # Afficher la carte interactive avec Streamlit
 map_result = st_folium(carte, width=800, height=600)
 
 # Afficher les informations du festival sélectionné
-if map_result and map_result['last_object_clicked']:
+if map_result and map_result.get('last_object_clicked'):
     lat = map_result['last_object_clicked']['lat']
     lon = map_result['last_object_clicked']['lng']
-    
+
     # Rechercher le festival correspondant
-    for festival in festivals:
-        if festival['latitude'] == lat and festival['longitude'] == lon:
-            st.subheader(f"Informations sur {festival['nom']}")
-            st.write(f"**Date** : {festival['date']}")
-            st.write(f"**Description** : {festival['description']}")
-            st.write(f"[Site du festival]({festival['lien']})")
+    for _, row in df_end.iterrows():
+        festival_lat, festival_lon = map(float, row['Géocodage xy'].split(','))
+        if abs(festival_lat - lat) < 0.0001 and abs(festival_lon - lon) < 0.0001:
+            st.subheader(f"Informations sur {row['Nom du festival']}")
+            st.write(f"**Date** : {row['Période principale de déroulement du festival']}")
+            st.write(f"**Description** : {row['Discipline dominante']} - {row['Envergure territoriale']}")
+            lien = row['Site internet du festival']
+            if pd.notna(lien):
+                st.write(f"[Site du festival]({lien})")
             break
