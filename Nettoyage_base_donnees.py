@@ -82,7 +82,7 @@ try:
     with fs.open(file_path_s3, "r") as file_in:
         df = pd.read_csv(file_in, sep=';', encoding='utf-8-sig')
     print("Fichier chargé avec succès :")
-    print(df_france.head())
+    print(df.head())
 except Exception as e:
     print(f"Erreur lors de l'importation du fichier : {e}")
 

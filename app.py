@@ -16,17 +16,41 @@ import folium
 from streamlit_folium import st_folium
 print("Les packages streamlit, folium et streamlit-folium sont installés et prêts à être utilisés !")
 
+import json
+
+
+
+
+# Charger les données utilisateur collectées
+try:
+    with open("user_data.json", "r") as json_file:
+        user_data = json.load(json_file)
+        print("Données utilisateur récupérées :", user_data)
+except FileNotFoundError:
+    print("Aucune donnée utilisateur n'a été collectée. Lancez 'questions.py' pour collecter les données.")
+
+
+
+
+# On importe les festivals
+import pandas as pd
+
+# Charger df_end depuis le fichier CSV
+df_end = pd.read_csv('df_end.csv')
+
 # Fonction pour afficher les festivals sur la carte
 def afficher_festivals_sur_carte(festivals, user_location):
     """
     Affiche les festivals sur une carte interactive avec l'adresse de l'utilisateur.
     
     Arguments :
-    festivals -- Liste de dictionnaires contenant les informations des festivals
-    Chaque festival doit avoir : 'nom', 'latitude', 'longitude', 'date', 'description', 'lien'
+    festivals -- DataFrame contenant les informations des festivals
+    Chaque festival doit avoir les colonnes : 
+    'Nom du festival', 'Géocodage xy', 'Période principale de déroulement du festival',
+    'Discipline dominante', 'Envergure territoriale', 'Site internet du festival'.
     user_location -- Tuple contenant (latitude, longitude) pour l'adresse de l'utilisateur
     """
-    carte = folium.Map(location=[46.603354, 1.888334], zoom_start=5, tiles="OpenStreetMap")
+    carte = folium.Map(location=user_location, zoom_start=6, tiles="OpenStreetMap")
     
     # Ajouter un marqueur pour l'utilisateur
     folium.Marker(
@@ -37,13 +61,17 @@ def afficher_festivals_sur_carte(festivals, user_location):
     ).add_to(carte)
     
     # Ajouter un marqueur pour chaque festival
-    for festival in festivals:
-        nom = festival['nom']
-        latitude = festival['latitude']
-        longitude = festival['longitude']
-        date = festival['date']
-        description = festival['description']
-        lien = festival['lien']
+    for _, row in festivals.iterrows():
+        # Extraire les coordonnées depuis la colonne 'Géocodage xy'
+        try:
+            lat, lon = map(float, row['Géocodage xy'].split(','))
+        except (ValueError, AttributeError):
+            continue  # Ignorer si les coordonnées ne sont pas valides
+        
+        nom = row['Nom du festival']
+        date = row['Période principale de déroulement du festival']
+        description = f"{row['Discipline dominante']} - {row['Envergure territoriale']}"
+        lien = row['Site internet du festival'] if pd.notna(row['Site internet du festival']) else "#"
         
         # Ajouter un marqueur avec popup
         popup_content = f"""
@@ -53,7 +81,7 @@ def afficher_festivals_sur_carte(festivals, user_location):
         <a href="{lien}" target="_blank" style="color:blue; text-decoration:underline;">Lien vers le site</a>
         """
         folium.Marker(
-            location=[latitude, longitude],
+            location=[lat, lon],
             popup=popup_content,
             tooltip=nom,
             icon=folium.Icon(color='blue', icon='info-sign')
@@ -61,39 +89,12 @@ def afficher_festivals_sur_carte(festivals, user_location):
     
     return carte
 
-# Exemple d'utilisation
-festivals = [
-    {
-        'nom': 'Festival de Cannes',
-        'latitude': 43.5513,
-        'longitude': 7.0128,
-        'date': 'Mai 2024',
-        'description': 'Festival international du film à Cannes.',
-        'lien': 'https://www.festival-cannes.com/'
-    },
-    {
-        'nom': 'Hellfest',
-        'latitude': 47.126,
-        'longitude': -1.254,
-        'date': 'Juin 2024',
-        'description': 'Festival de musique rock et métal à Clisson.',
-        'lien': 'https://www.hellfest.fr/'
-    },
-    {
-        'nom': 'Vieilles Charrues',
-        'latitude': 48.275,
-        'longitude': -3.564,
-        'date': 'Juillet 2024',
-        'description': 'Festival de musique à Carhaix.',
-        'lien': 'https://www.vieillescharrues.asso.fr/'
-    }
-]
 
-user_location = (48.8566, 2.3522)  # Paris
+user_location = user_data['coordinates']
 
 # Afficher la carte dans Streamlit
 st.title("Carte des Festivals en France")
-carte = afficher_festivals_sur_carte(festivals, user_location)
+carte = afficher_festivals_sur_carte(df_end, user_location)
 
 # Afficher la carte interactive avec Streamlit
 map_result = st_folium(carte, width=800, height=600)
