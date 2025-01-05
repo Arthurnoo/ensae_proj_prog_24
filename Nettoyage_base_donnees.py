@@ -1,13 +1,11 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# 
-# 
 # # Nettoyage de la base de données
 # 
-# ### <u>1. Description de la base de données
+# ## I. Description de la base de données
 # 
-# **Les données** </u>
+# **Les données**
 # 
 # La base de données utilisée est celle de Data.gouv qui liste les festivals en France. Les critères de sélection des festivals sont les suivants :
 # - avoir eu lieu en 2019
@@ -27,8 +25,8 @@
 # - Données temporelles : période de déroulement, date de création...
 # - Trouver/communiquer avec le festival : site internet et adresse mail.
 
-# ### <u>2. Suppression des données inutiles 
-# </u>
+# ## II. Suppression des données inutiles 
+# 
 # 
 # On a choisit de supprimer les colonnes suivantes : 
 # - Code postal (de la commune principale de déroulement)
@@ -48,7 +46,7 @@
 # On a aussi fait le choix de ne conserver que les festivals se déroulant en France métropolitaine. 
 # 
 
-# In[5]:
+# In[2]:
 
 
 import os
@@ -56,9 +54,9 @@ import s3fs
 import pandas as pd
 
 # Configuration des variables d'environnement
-os.environ["AWS_ACCESS_KEY_ID"] = '4DYBKFH7ZKKBNMIYH7VD'
-os.environ["AWS_SECRET_ACCESS_KEY"] = '4wGtwPtf++JHMKcUkBp4viyzgM7DGbTNJwUdtIFz'
-os.environ["AWS_SESSION_TOKEN"] = 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NLZXkiOiI0RFlCS0ZIN1pLS0JOTUlZSDdWRCIsImFsbG93ZWQtb3JpZ2lucyI6WyIqIl0sImF1ZCI6WyJtaW5pby1kYXRhbm9kZSIsIm9ueXhpYSIsImFjY291bnQiXSwiYXV0aF90aW1lIjoxNzM0NDI3MzY4LCJhenAiOiJvbnl4aWEiLCJlbWFpbCI6ImFydGh1ci5uZWF1QGVuc2FlLmZyIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImV4cCI6MTczNjA4ODM3NSwiZmFtaWx5X25hbWUiOiJOZWF1IiwiZ2l2ZW5fbmFtZSI6IkFydGh1ciIsImdyb3VwcyI6WyJVU0VSX09OWVhJQSJdLCJpYXQiOjE3MzU0ODM1NzUsImlzcyI6Imh0dHBzOi8vYXV0aC5sYWIuc3NwY2xvdWQuZnIvYXV0aC9yZWFsbXMvc3NwY2xvdWQiLCJqdGkiOiJlMTgzZTY4NS1mNzEzLTQ0YTktOWNmZC00NTY1MWQxZmYzMzIiLCJuYW1lIjoiQXJ0aHVyIE5lYXUiLCJwb2xpY3kiOiJzdHNvbmx5IiwicHJlZmVycmVkX3VzZXJuYW1lIjoiYXJ0aHVybmVhdSIsInJlYWxtX2FjY2VzcyI6eyJyb2xlcyI6WyJvZmZsaW5lX2FjY2VzcyIsInVtYV9hdXRob3JpemF0aW9uIiwiZGVmYXVsdC1yb2xlcy1zc3BjbG91ZCJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sInJvbGVzIjpbIm9mZmxpbmVfYWNjZXNzIiwidW1hX2F1dGhvcml6YXRpb24iLCJkZWZhdWx0LXJvbGVzLXNzcGNsb3VkIl0sInNjb3BlIjoib3BlbmlkIHByb2ZpbGUgZ3JvdXBzIGVtYWlsIiwic2lkIjoiYzViZTMxM2EtNzlmYS00ZDMzLTg1MjEtNjcxYTQ1Y2VmMWVlIiwic3ViIjoiNjY0OTQ3YjUtNjE5OC00NTBiLWI3MzctODc1MTQ4ZDcwYThkIiwidHlwIjoiQmVhcmVyIn0.J1FI5o8t-VkPvoDVxLl64MHOrIEJezOo6ZyEKg2Z0URscUjfIAXp94SrOMo6DqJOtaGCIHTNf-8XThndR0fIjQ'
+os.environ["AWS_ACCESS_KEY_ID"] = '0AYUHWP2SN3GR33LNA96'
+os.environ["AWS_SECRET_ACCESS_KEY"] = 'yiKIuXZKdKcxX3J4XHO2I6xdGQfHbE3ITDkr45+x'
+os.environ["AWS_SESSION_TOKEN"] = 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NLZXkiOiIwQVlVSFdQMlNOM0dSMzNMTkE5NiIsImFsbG93ZWQtb3JpZ2lucyI6WyIqIl0sImF1ZCI6WyJtaW5pby1kYXRhbm9kZSIsIm9ueXhpYSIsImFjY291bnQiXSwiYXV0aF90aW1lIjoxNzM2MDg3NTgwLCJhenAiOiJvbnl4aWEiLCJlbWFpbCI6ImFydGh1ci5uZWF1QGVuc2FlLmZyIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImV4cCI6MTczNjY5MjQwNiwiZmFtaWx5X25hbWUiOiJOZWF1IiwiZ2l2ZW5fbmFtZSI6IkFydGh1ciIsImdyb3VwcyI6WyJVU0VSX09OWVhJQSJdLCJpYXQiOjE3MzYwODc2MDYsImlzcyI6Imh0dHBzOi8vYXV0aC5sYWIuc3NwY2xvdWQuZnIvYXV0aC9yZWFsbXMvc3NwY2xvdWQiLCJqdGkiOiIyNDVjMzhkYi0wNWI5LTQyN2QtODFhOS1lN2E2MTY0NWE3MTQiLCJuYW1lIjoiQXJ0aHVyIE5lYXUiLCJwb2xpY3kiOiJzdHNvbmx5IiwicHJlZmVycmVkX3VzZXJuYW1lIjoiYXJ0aHVybmVhdSIsInJlYWxtX2FjY2VzcyI6eyJyb2xlcyI6WyJvZmZsaW5lX2FjY2VzcyIsInVtYV9hdXRob3JpemF0aW9uIiwiZGVmYXVsdC1yb2xlcy1zc3BjbG91ZCJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sInJvbGVzIjpbIm9mZmxpbmVfYWNjZXNzIiwidW1hX2F1dGhvcml6YXRpb24iLCJkZWZhdWx0LXJvbGVzLXNzcGNsb3VkIl0sInNjb3BlIjoib3BlbmlkIHByb2ZpbGUgZ3JvdXBzIGVtYWlsIiwic2lkIjoiNDNiNzRhZjktZmNkOC00MmExLTkyNzItMTVmZjA1MzM0ZjYzIiwic3ViIjoiNjY0OTQ3YjUtNjE5OC00NTBiLWI3MzctODc1MTQ4ZDcwYThkIiwidHlwIjoiQmVhcmVyIn0.DV6-tLYquu3kzFFRtKk0_TBnBEKDomEJ1wVbDqa_L2bnyH2Qf8a0s7YgLYNtQpASMGHiBfbYsZO6ur7E3K68Og'
 os.environ["AWS_DEFAULT_REGION"] = 'us-east-1'
 
 # Initialisation de la connexion à MinIO
@@ -108,9 +106,9 @@ df = df[~df["Région principale de déroulement"].isin(regions_non_metropolitain
 print(df["Région principale de déroulement"].unique())
 
 
-# ### <u>3. Modification et mise en forme des données  
+# ## III. Modification et mise en forme des données  
 # 
-# **Transformation des données** </u>
+# **Transformation des données**
 # 
 # Transformation des données sous forme de listes de listes. La première clef utilisée est nom du festival_identifiant car il y a des festivals ayant le même nom mais se déroulant sur des communes différentes. Ajouter l'identifiant permet d'avoir une clef unique. 
 # 
@@ -1682,7 +1680,7 @@ print(f"Nombre total de festivals ayant pour sous-catégorie 'Musiques folk et p
 print(df.head())
 
 
-# ### <u>4. Supression des anciennes colonnes  <u>
+# ## IV. Supression des anciennes colonnes
 
 # In[31]:
 
@@ -1702,7 +1700,7 @@ if __name__ == "__main__":
     pass
 
 
-# ### <u>5. Bon format de la colonne période  <u>
+# ## V. Bon format de la colonne période
 
 # In[33]:
 
